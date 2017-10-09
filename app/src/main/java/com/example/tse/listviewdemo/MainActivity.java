@@ -19,21 +19,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        Retrofit retrofit = new Retrofit.Builder()
+        //基礎網路設定
+        Retrofit retrofit = new Retrofit.Builder()//--> compile 'com.squareup.retrofit2:retrofit:2.3.0'
                 .baseUrl("https://api.github.com/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())//--> compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 
                 .build();
 
+        //根據設定創建網路服務
         GitHubService service = retrofit.create(GitHubService.class);
-        Call<List<Repo>> repos =  service.listRepos("HSin-Tse");
 
+        //該服務創建實際需要的進程
+        Call<List<Repo>> repos = service.listRepos("HSin-Tse");
+
+        //進程 入站
         repos.enqueue(new Callback<List<Repo>>() {
             @Override
             public void onResponse(Call<List<Repo>> call, Response<List<Repo>> response) {
-                Log.d("tse","repos.size():"+response.body().size());
-                Log.d("tse","repos.size():"+response.body().get(0).getName());
+                Log.d("tse", "repos.size():" + response.body().size());
+                Log.d("tse", "repos.size():" + response.body().get(0).getName());
 
             }
 
