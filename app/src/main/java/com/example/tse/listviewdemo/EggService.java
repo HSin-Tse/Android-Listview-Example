@@ -1,7 +1,10 @@
 package com.example.tse.listviewdemo;
 
+import com.example.tse.listviewdemo.beans.Login;
+
 import retrofit2.Call;
-import retrofit2.http.Headers;
+import retrofit2.http.Body;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 /**
@@ -10,10 +13,8 @@ import retrofit2.http.POST;
 
 public interface EggService {
     @POST("pos/login")
-    @Headers({
-            "Content-Type: application/json;charset=UTF-8",
-            "User-Agent: Retrofit-your-App"})
-    Call<Egg> Login();
+//    @Headers({"Content-Type: application/json",})
+    Call<Login> Login(@Header("Content-Type") String contentRange , @Body FooRequest body);
 //    Call<playlist> addToPlaylist(@Header("Content-Type") String content_type, @Body PlaylistParm parm);
 
 }
