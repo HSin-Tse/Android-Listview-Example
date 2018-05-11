@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.example.tse.listviewdemo.beans.Login;
 
+import java.io.IOException;
 import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLContext;
@@ -14,7 +15,10 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,15 +45,39 @@ public class MainActivity extends AppCompatActivity {
 //https://api.sandan.store/pos/login
 
 
+
+        ///
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(new Interceptor() {
+                                      @Override
+                                      public okhttp3.Response intercept(Chain chain) throws IOException {
+                                          Request original = chain.request();
+
+                                          Request request = original.newBuilder()
+//                                                  .header("Content-Type", "application/json")
+                                                  .header("Test", "Tse")
+                                                  .method(original.method(), original.body())
+                                                  .build();
+
+                                          return chain.proceed(request);
+                                      }
+                                  });
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        httpClient.addInterceptor(interceptor).build();
+
+        OkHttpClient client = httpClient.build();
         Retrofit retrofitEgg = new Retrofit.Builder()//--> compile 'com.squareup.retrofit2:retrofit:2.3.0'
                 .baseUrl("https://api.sandan.store/")
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())//--> compile 'com.squareup.retrofit2:converter-gson:2.1.0'
                 .build();
         //根據設定創建網路服務
         EggService serviceEgg = retrofitEgg.create(EggService.class);
 
         //該服務創建實際需要的進程
-        Call<Login> reposEgg = serviceEgg.Login("application/json",new FooRequest("admin","123456"));
+        Call<Login> reposEgg = serviceEgg.Login(new FooRequest("admin","123456"));
 
         //進程 入站
         reposEgg.enqueue(new Callback<Login>() {
